@@ -6,7 +6,25 @@ import { DragDropContext } from 'react-beautiful-dnd';
 const App = () => {
   const [initState, setInitState] = useState(initialData);
 
+  const onDragStart = () => {
+    document.body.style.color = 'orange';
+    document.body.style.transition = 'all 0.4s';
+  };
+
+  const onDragUpdate = (update) => {
+    const { destination } = update;
+    const opacity = destination
+      ? destination.index / Object.keys(initState.tasks).length
+      : 0;
+
+    document.body.style.backgroundColor = `rgba(153, 141, 217, ${opacity})`;
+  };
+
   const onDragEnd = (result) => {
+    // reset color changed by other callbacks
+    document.body.style.color = 'inherit';
+    document.body.style.backgroundColor = 'white';
+
     // destructure result object
     const { draggableId, source, destination } = result;
 
@@ -52,7 +70,11 @@ const App = () => {
   };
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
+    <DragDropContext
+      onDragEnd={onDragEnd}
+      onDragStart={onDragStart}
+      onDragUpdate={onDragUpdate}
+    >
       {initState.columnOrder.map((colId) => {
         // use id of column to ensure the columns order
         const columnObjectOfCurrentId = initState.columns[colId];
